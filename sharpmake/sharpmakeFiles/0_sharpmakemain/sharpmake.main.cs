@@ -1,9 +1,9 @@
 using System.IO;
 
-[module: Sharpmake.Include(@"base\*")]
+[module: Sharpmake.Include(@"..\base\*")]
 
 //Examples
-[module: Sharpmake.Include(@"utils\*")]
+[module: Sharpmake.Include(@"..\utils\*")]
 
 public static class SharpmakeMainClass
 {
