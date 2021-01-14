@@ -14,6 +14,7 @@ namespace puma
 
         IDType value() const { return m_value; }
         bool isValid() const { return InvalidValue != m_value; }
+        void invalidate()    { m_value = InvalidValue; }
 
     private:
         IDType m_value = InvalidValue;
