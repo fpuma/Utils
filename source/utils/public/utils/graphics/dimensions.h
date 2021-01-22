@@ -6,10 +6,10 @@ namespace puma
 {
     struct Extent
     {
-        s32 width;
-        s32 height;
-        s32 xPos;
-        s32 yPos;
+        s32 width = 0;
+        s32 height = 0;
+        s32 xPos = 0;
+        s32 yPos = 0;
     };
 
     struct Rect
