@@ -50,10 +50,7 @@ namespace puma
             itElement = emplaceResult.first;
             assert( m_elements.end() != itElement );
 
-            if ( m_onAddedCallback )
-            {
-                m_onAddedCallback( itElement->first, itElement->second.get() );
-            }
+            onAdded( itElement->first, itElement->second.get() );
 
             return static_cast<T*>(itElement->second.get());
         }
@@ -81,10 +78,7 @@ namespace puma
             auto itElement = getElement<T>();
             assert( itElement != m_elements.end() ); //The element to be removed does not exist 
 
-            if( m_onRemovedCallback )
-            {
-                m_onRemovedCallback( itElement->first, itElement->second.get() );
-            }
+            onRemoved( itElement->first, itElement->second.get() );
 
             m_elements.erase( itElement );
         }
@@ -178,10 +172,9 @@ namespace puma
     protected:
 
         using Key = std::type_index;
-        using Callback = std::function<void( Key, BaseClass* )>;
 
-        void setOnAddedCallback( Callback _callback ) { m_onAddedCallback = _callback; }
-        void setOnRemovedCallback( Callback _callback ) { m_onRemovedCallback = _callback; }
+        virtual void onAdded( Key _key, BaseClass* _system ) {}
+        virtual void onRemoved( Key _key, BaseClass* _system ) {}
 
     private:
 
@@ -210,9 +203,5 @@ namespace puma
         Elements m_elements;
         RegisteredClassesMap m_registeredClasses;
         Factories m_factories;
-
-        Callback m_onAddedCallback;
-        Callback m_onRemovedCallback;
-
     };
 }
