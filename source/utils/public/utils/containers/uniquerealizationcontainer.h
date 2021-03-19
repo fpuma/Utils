@@ -151,6 +151,15 @@ namespace puma
             m_factories.emplace( realizationType, []() { return std::make_unique<RealizedClass>(); } );
         }
 
+        template<class ClassToCheck>
+        bool isRegistered()
+        {
+            auto classType = std::type_index( typeid(ClassToCheck) );
+            
+            auto itRegisteredClass = m_registeredClasses.find( classType );
+            return m_registeredClasses.end() != itRegisteredClass;
+        }
+
         void traverse( std::function<void( BaseClass* )> _function )
         {
             for ( auto itElement = m_elements.begin(); itElement != m_elements.end(); ++itElement )
