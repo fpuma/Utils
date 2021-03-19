@@ -17,19 +17,31 @@ namespace puma
     {
     public:
 
-        static MappedRealizationContainer<Key, BaseClass> createWithExistingRegistries( const MappedRealizationContainer<Key, BaseClass>& _container )
-        {
-            return MappedRealizationContainer<BaseClass>( _container );
-        }
-
         MappedRealizationContainer() = default;
+
+        MappedRealizationContainer( const MappedRealizationContainer<Key, BaseClass>& _container )
+            : m_elements( _container.m_elements )
+            , m_containerRegistryTemplate( _container.m_containerRegistryTemplate )
+        {}
 
         MappedRealizationContainer( MappedRealizationContainer<Key, BaseClass>&& _container ) noexcept
             : m_elements( std::move( _container ) )
             , m_containerRegistryTemplate( std::move( _container ) )
         {}
 
-        MappedRealizationContainer& operator =( const MappedRealizationContainer& _services ) = delete;
+        MappedRealizationContainer& operator =( const MappedRealizationContainer& _container )
+        {
+            m_elements = _container.m_elements;
+            m_containerRegistryTemplate = _container.m_containerRegistryTemplate;
+            return *this;
+        }
+
+        MappedRealizationContainer& operator =( const MappedRealizationContainer&& _container )
+        {
+            m_elements = std::move(_container.m_elements);
+            m_containerRegistryTemplate = std::move(_container.m_containerRegistryTemplate);
+            return *this;
+        }
 
         template<class T>
         T* add( Key _key )
@@ -40,7 +52,7 @@ namespace puma
             
             if ( m_elements.end() == itElement )
             {
-                auto emplaceResult = m_elements.emplace( _key, std::move( UniqueRealizationContainer<BaseClass>::createWithExistingRegistries( m_containerRegistryTemplate ) ) );
+                auto emplaceResult = m_elements.emplace( _key, std::move( m_containerRegistryTemplate.cloneRegistriesOnly() ) );
                 assert( emplaceResult.second );
 
                 itElement = emplaceResult.first;
@@ -115,11 +127,6 @@ namespace puma
         }
 
     private:
-
-        MappedRealizationContainer( const MappedRealizationContainer<Key, BaseClass>& _container )
-            : m_elements()
-            , m_containerRegistryTemplate( _container.m_containerRegistryTemplate )
-        {}
 
         std::map<Key, UniqueRealizationContainer<BaseClass>> m_elements;
         UniqueRealizationContainer<BaseClass> m_containerRegistryTemplate;

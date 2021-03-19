@@ -7,6 +7,7 @@
 #include <utils/noncopyable.h>
 #include <utils/numerictypes.h>
 #include <utils/random.h>
+#include <utils/stringformat.h>
 
 #include <iostream>
 
@@ -121,7 +122,7 @@ namespace puma::utils
 
 
 
-            UniqueRealizationContainer<IBase> container1 = UniqueRealizationContainer<IBase>::createWithExistingRegistries( container0 );
+            UniqueRealizationContainer<IBase> container1 = container0.cloneRegistriesOnly();
 
             Test* testCont1 = container1.add<Test>();
 
@@ -186,10 +187,15 @@ namespace puma::utils
 
             stateMachine.uninit( testInfo );
 
-
+            //-----------------------------------------------------------------------
             TestID testId;
 
-            std::cout << testId.value();
+            std::cout << testId.value()<< std::endl << std::endl;
+
+            //--------------------------------------------------------------------
+
+            std::cout << "Testing string format:" << std::endl;
+            std::cout << formatString( "This is a number %d and this is a string \"%s\"", 88, "fpuma" );
         }
     }
 }

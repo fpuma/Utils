@@ -14,12 +14,13 @@ namespace puma
     {
     public:
 
-        static UniqueRealizationContainer<BaseClass> createWithExistingRegistries( const UniqueRealizationContainer<BaseClass>& _container )
-        {
-            return UniqueRealizationContainer<BaseClass>( _container );
-        }
-
         UniqueRealizationContainer() = default;
+
+        UniqueRealizationContainer( const UniqueRealizationContainer<BaseClass>& _container )
+            : m_elements( _container.m_elements)
+            , m_registeredClasses( _container.m_registeredClasses )
+            , m_factories( _container.m_factories )
+        {}
 
         UniqueRealizationContainer( UniqueRealizationContainer<BaseClass>&& _container ) noexcept
             : m_elements( std::move( _container.m_elements ) )
@@ -27,8 +28,27 @@ namespace puma
             , m_factories( std::move( _container.m_factories ) )
         {}
 
-        UniqueRealizationContainer& operator =( const UniqueRealizationContainer<BaseClass>& _container ) = delete;
+        UniqueRealizationContainer& operator =( const UniqueRealizationContainer<BaseClass>& _container )
+        {
+            m_elements = _container.m_elements;
+            m_registeredClasses = _container.m_registeredClasses;
+            m_factories = _container.m_factories;
+            return *this;
+        }
         
+        UniqueRealizationContainer& operator =( const UniqueRealizationContainer<BaseClass>&& _container )
+        {
+            m_elements = std::move(_container.m_elements);
+            m_registeredClasses = std::move(_container.m_registeredClasses);
+            m_factories = std::move(_container.m_factories);
+            return *this;
+        }
+
+        UniqueRealizationContainer<BaseClass> cloneRegistriesOnly()
+        {
+            return UniqueRealizationContainer<BaseClass>( *this, true );
+        }
+
         template<class T>
         T* add()
         {
@@ -194,7 +214,7 @@ namespace puma
         using RegisteredClassesMap = std::map<InterfaceID, RealizationID>;
         using Factories = std::map<RealizationID, std::function<std::unique_ptr<BaseClass>()>>;
 
-        UniqueRealizationContainer( const UniqueRealizationContainer<BaseClass>& _container )
+        UniqueRealizationContainer( const UniqueRealizationContainer<BaseClass>& _container, bool _cloneRegistriesOnly )
             : m_elements()
             , m_registeredClasses( _container.m_registeredClasses )
             , m_factories( _container.m_factories )
