@@ -17,4 +17,10 @@ namespace puma
         s32 width = 0;
         s32 height = 0;
     };
+
+    struct ScreenPos
+    {
+        s32 xCoord = 0;
+        s32 yCoord = 0;
+    };
 }
