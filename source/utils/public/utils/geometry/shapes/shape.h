@@ -20,7 +20,17 @@ namespace puma
     public:
 
         Shape() {}
+        Shape( const Shape& _other )
+        {
+            copyFromShape( _other );
+        }
         ~Shape() {}
+
+        Shape& operator = ( const Shape& _other )
+        {
+            copyFromShape( _other );
+            return *this;
+        }
 
         ShapeType getShapeType() const { return m_shapeType; }
 
@@ -36,6 +46,19 @@ namespace puma
 
     private:
 
+        void copyFromShape( const Shape& _other )
+        {
+            m_shapeType = _other.m_shapeType;
+            switch ( m_shapeType )
+            {
+            case ShapeType::Chain: {m_shape.chain = _other.getAsChain(); break; }
+            case ShapeType::Circle: {m_shape.circle = _other.getAsCircle(); break; }
+            case ShapeType::Polygon: {m_shape.polygon = _other.getAsPolygon(); break; }
+            case ShapeType::Rectangle: {m_shape.rectangle = _other.getAsRectangle(); break; }
+            default: assert( false ); //Shape not supported
+            }
+        }
+
         union InternalShape
         {
             InternalShape() {}
@@ -45,6 +68,8 @@ namespace puma
             Polygon polygon;
             Rectangle rectangle;
         }m_shape;
+
+
 
         ShapeType m_shapeType = ShapeType::Circle;
     };
