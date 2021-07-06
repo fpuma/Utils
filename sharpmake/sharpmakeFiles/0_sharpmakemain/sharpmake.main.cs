@@ -2,8 +2,8 @@ using System.IO;
 
 [module: Sharpmake.Include(@"..\base\*")]
 
-//Examples
 [module: Sharpmake.Include(@"..\utils\*")]
+[module: Sharpmake.Include(@"..\extern\*")]
 
 public static class SharpmakeMainClass
 {

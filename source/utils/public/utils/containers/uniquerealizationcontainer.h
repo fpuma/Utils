@@ -59,10 +59,10 @@ namespace puma
             assert( itElement == m_elements.end() ); //An element of that type already exists
 
             auto itRegisteredClass = m_registeredClasses.find( typeIndex );
-            assert( m_registeredClasses.end() != itRegisteredClass ); //The class or interface you are trying to add has not been registered
+            assert( itRegisteredClass != m_registeredClasses.end() ); //The class or interface you are trying to add has not been registered
 
             auto itFactory = m_factories.find( itRegisteredClass->second );
-            assert( m_factories.end() != itFactory ); //Could not find the factory
+            assert( itFactory != m_factories.end() ); //Could not find the factory
 
             auto emplaceResult = m_elements.emplace( itRegisteredClass->second, itFactory->second() );
             assert( emplaceResult.second );
@@ -82,7 +82,7 @@ namespace puma
             auto typeIndex = std::type_index( typeid(T) );
             
             auto itRegisteredClass = m_registeredClasses.find( typeIndex );
-            assert( m_registeredClasses.end() != itRegisteredClass ); // The type has not been registered
+            assert( itRegisteredClass != m_registeredClasses.end() ); // The type has not been registered
 
             auto itElement = m_elements.find( itRegisteredClass->second );
             assert( itElement != m_elements.end() ); //There is no element of that type
@@ -132,9 +132,9 @@ namespace puma
 
 #ifdef _DEBUG
             auto itRegisteredClass = m_registeredClasses.find( interfaceType );
-            assert( m_registeredClasses.end() == itRegisteredClass ); //That interface has already been registered
+            assert( itRegisteredClass == m_registeredClasses.end() ); //That interface has already been registered
             itRegisteredClass = m_registeredClasses.find( realizedType );
-            assert( m_registeredClasses.end() == itRegisteredClass ); //That realization has already been registered
+            assert( itRegisteredClass == m_registeredClasses.end() ); //That realization has already been registered
 #endif
 
             m_registeredClasses.emplace( interfaceType, realizedType );
@@ -165,7 +165,7 @@ namespace puma
             auto realizationType = std::type_index( typeid(RealizedClass) );
 #ifdef _DEBUG
             auto itRegisteredClass = m_registeredClasses.find( realizationType );
-            assert( m_registeredClasses.end() == itRegisteredClass ); //That interface has already been registered
+            assert( itRegisteredClass == m_registeredClasses.end() ); //That interface has already been registered
 #endif
             m_registeredClasses.emplace( realizationType, realizationType );
             m_factories.emplace( realizationType, []() { return std::make_unique<RealizedClass>(); } );
