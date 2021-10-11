@@ -1,12 +1,12 @@
 #pragma once
 
 #include <utils/geometry/vec2.h>
-#include <vector>
+#include <utils/graphics/dimensions.h>
 
 namespace puma
 {
     struct Polygon
     {
-        std::vector<Vec2> vertices;
+        ShapeVerticesList vertices;
     };
 }

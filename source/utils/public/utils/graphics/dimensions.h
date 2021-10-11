@@ -1,5 +1,8 @@
 #pragma once
 
+#include <utils/containers/containedvector.h>
+#include <utils/geometry/shapes/shapedefs.h>
+#include <utils/geometry/vec2.h>
 #include <utils/numerictypes.h>
 
 namespace puma
@@ -23,4 +26,13 @@ namespace puma
         s32 xCoord = 0;
         s32 yCoord = 0;
     };
+
+    struct Rectangle
+    {
+        Vec2 upperBoundary;
+        Vec2 lowerBoundary;
+    };
+
+    using ShapeVerticesList = ContainedVector<Vec2, kMaxVerticesPerShape>;
+    using ShapeScreenPointsList = ContainedVector<ScreenPos, kMaxVerticesPerShape>;
 }

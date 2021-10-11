@@ -1,7 +1,7 @@
+#include <utils/containers/containedvector.h>
 #include <utils/containers/mappedrealizationcontainer.h>
 #include <utils/containers/uniquerealizationcontainer.h>
 #include <utils/geometry/shapes/cirlce.h>
-#include <utils/geometry/shapes/rectangle.h>
 #include <utils/geometry/shapes/shape.h>
 #include <utils/geometry/vec2.h>
 #include <utils/geometry/vec3.h>

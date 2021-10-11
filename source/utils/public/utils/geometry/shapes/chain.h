@@ -1,12 +1,12 @@
 #pragma once
 
 #include <utils/geometry/vec2.h>
-#include <vector>
+#include <utils/graphics/dimensions.h>
 
 namespace puma
 {
     struct Chain
     {
-        std::vector<Vec2> points;
+        ShapeVerticesList points;
     };
 }

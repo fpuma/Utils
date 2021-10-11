@@ -3,18 +3,12 @@
 #include <utils/geometry/shapes/chain.h>
 #include <utils/geometry/shapes/cirlce.h>
 #include <utils/geometry/shapes/polygon.h>
-#include <utils/geometry/shapes/rectangle.h>
+#include <utils/geometry/shapes/shapedefs.h>
+#include <utils/graphics/dimensions.h>
+#include <utils/numerictypes.h>
 
 namespace puma
 {
-    enum class ShapeType
-    {
-        Chain,
-        Circle,
-        Rectangle,
-        Polygon,
-    };
-
     class Shape
     {
     public:
@@ -37,12 +31,20 @@ namespace puma
         void setAsChain     ( const Chain& _chain )            { m_shape.chain = _chain; m_shapeType = ShapeType::Chain; }
         void setAsCircle    ( const Circle& _circle )          { m_shape.circle = _circle; m_shapeType = ShapeType::Circle; }
         void setAsPolygon   ( const Polygon& _polygon )        { m_shape.polygon = _polygon; m_shapeType = ShapeType::Polygon; }
-        void setAsRectangle ( const Rectangle& _rectangle )    { m_shape.rectangle = _rectangle; m_shapeType = ShapeType::Rectangle; }
+        void setAsPolygon   ( const Rectangle& _rectangle )
+        {
+            Polygon polygon;
+            polygon.vertices.push_back( { _rectangle.lowerBoundary.x, _rectangle.lowerBoundary.y } );
+            polygon.vertices.push_back( { _rectangle.upperBoundary.x, _rectangle.lowerBoundary.y } );
+            polygon.vertices.push_back( { _rectangle.upperBoundary.x, _rectangle.upperBoundary.y } );
+            polygon.vertices.push_back( { _rectangle.lowerBoundary.x, _rectangle.upperBoundary.y } );
+            m_shape.polygon = polygon;
+            m_shapeType = ShapeType::Polygon;
+        }
 
         Chain getAsChain()          const { assert( m_shapeType == ShapeType::Chain ); return m_shape.chain; }
         Circle getAsCircle()        const { assert( m_shapeType == ShapeType::Circle ); return m_shape.circle; }
         Polygon getAsPolygon()      const { assert( m_shapeType == ShapeType::Polygon ); return m_shape.polygon; }
-        Rectangle getAsRectangle()  const { assert( m_shapeType == ShapeType::Rectangle ); return m_shape.rectangle; }
 
     private:
 
@@ -54,7 +56,6 @@ namespace puma
             case ShapeType::Chain: {m_shape.chain = _other.getAsChain(); break; }
             case ShapeType::Circle: {m_shape.circle = _other.getAsCircle(); break; }
             case ShapeType::Polygon: {m_shape.polygon = _other.getAsPolygon(); break; }
-            case ShapeType::Rectangle: {m_shape.rectangle = _other.getAsRectangle(); break; }
             default: assert( false ); //Shape not supported
             }
         }
@@ -66,7 +67,6 @@ namespace puma
             Chain chain;
             Circle circle = {};
             Polygon polygon;
-            Rectangle rectangle;
         }m_shape;
 
 
