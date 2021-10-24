@@ -42,9 +42,13 @@ namespace puma
             m_shapeType = ShapeType::Polygon;
         }
 
-        Chain getAsChain()          const { assert( m_shapeType == ShapeType::Chain ); return m_shape.chain; }
-        Circle getAsCircle()        const { assert( m_shapeType == ShapeType::Circle ); return m_shape.circle; }
-        Polygon getAsPolygon()      const { assert( m_shapeType == ShapeType::Polygon ); return m_shape.polygon; }
+        const Chain& getAsChain()          const { assert( m_shapeType == ShapeType::Chain ); return m_shape.chain; }
+        const Circle& getAsCircle()        const { assert( m_shapeType == ShapeType::Circle ); return m_shape.circle; }
+        const Polygon& getAsPolygon()      const { assert( m_shapeType == ShapeType::Polygon ); return m_shape.polygon; }
+
+        Chain& editAsChain() { assert( m_shapeType == ShapeType::Chain ); return m_shape.chain; }
+        Circle& editAsCircle() { assert( m_shapeType == ShapeType::Circle ); return m_shape.circle; }
+        Polygon& editAsPolygon() { assert( m_shapeType == ShapeType::Polygon ); return m_shape.polygon; }
 
     private:
 
