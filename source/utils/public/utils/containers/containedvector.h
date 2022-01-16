@@ -15,7 +15,13 @@ namespace puma
         using const_iterator = typename std::array<ElementType, ContainerSize>::const_iterator;
         using value_type = typename ElementType;
 
-        ElementType operator [] ( size_t _index ) const
+        ElementType& operator [] ( size_t _index )
+        {
+            assert( _index < size() );
+            return m_container[_index];
+        }
+
+        const ElementType& operator [] ( size_t _index ) const
         {
             assert( _index < size() );
             return m_container[_index];
