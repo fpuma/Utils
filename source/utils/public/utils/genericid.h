@@ -23,3 +23,12 @@ namespace puma
         IDType m_value = InvalidValue;
     };
 }
+
+#define DECLARE_GENERIC_ID(ID_NAME, ID_TYPE, INVALID_ID_VALUE)     class ID_NAME : public puma::GenericID<ID_TYPE, INVALID_ID_VALUE>\
+{\
+public:\
+    ID_NAME() {}\
+    ID_NAME( ID_TYPE _id )\
+        : GenericID( _id )\
+    {}\
+};
