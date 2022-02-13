@@ -13,6 +13,7 @@ namespace puma
         
         GenericID&  operator =  ( const GenericID& _other ) { m_value = _other.m_value; return *this; }
         bool        operator == ( const GenericID& _other ) const { return m_value == _other.m_value; }
+        bool        operator != ( const GenericID& _other ) const { return m_value != _other.m_value; }
         bool        operator <  ( const GenericID& _other ) const { return m_value < _other.m_value; }
 
         IDType value() const { return m_value; }
