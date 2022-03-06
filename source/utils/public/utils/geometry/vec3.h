@@ -1,5 +1,7 @@
 #pragma once
 
+#include <math.h>
+
 namespace puma
 {
 
@@ -54,6 +56,17 @@ namespace puma
         float squaredLength() const
         {
             return (x * x) + (y * y) + (z * z);
+        }
+
+        float length() const
+        {
+            return sqrtf( squaredLength() );
+        }
+
+        Vec3 normalize() const
+        {
+            float vecLength = length();
+            return { x / vecLength, y / vecLength, z / vecLength };
         }
 
         float x = 0;
