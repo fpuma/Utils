@@ -52,7 +52,12 @@ namespace puma
         Vec2 normalize() const
         {
             float vecLength = length();
-            return { x / vecLength, y / vecLength };
+            Vec2 result;
+            if ( vecLength > 0.0f )
+            {
+                result = { x / vecLength, y / vecLength };
+            }
+            return result;
         }
 
         float x = 0.0f;
