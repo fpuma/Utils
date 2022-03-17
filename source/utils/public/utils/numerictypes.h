@@ -1,5 +1,7 @@
 #pragma once
 
+#include <limits>
+
 namespace puma
 {
     using u8    = unsigned char;
@@ -12,13 +14,13 @@ namespace puma
     using s32   = int;
     using s64   = long long;
 
-    constexpr u8  kMaxU8  = (u8) ~0x0;
-    constexpr u16 kMaxU16 = (u16)~0x0;
-    constexpr u32 kMaxU32 = (u32)~0x0;
-    constexpr u64 kMaxU64 = (u64)~0x0;
+    constexpr u8  kMaxU8  = std::numeric_limits<u8>::max();
+    constexpr u16 kMaxU16 = std::numeric_limits<u16>::max();
+    constexpr u32 kMaxU32 = std::numeric_limits<u32>::max();
+    constexpr u64 kMaxU64 = std::numeric_limits<u64>::max();
 
-    constexpr s8  kMaxS8  = (s8) ~0x0;
-    constexpr s16 kMaxS16 = (s16)~0x0;
-    constexpr s32 kMaxS32 = (s32)~0x0;
-    constexpr s64 kMaxS64 = (s64)~0x0;
+    constexpr s8  kMaxS8  = std::numeric_limits<s8>::max();
+    constexpr s16 kMaxS16 = std::numeric_limits<s16>::max();
+    constexpr s32 kMaxS32 = std::numeric_limits<s32>::max();
+    constexpr s64 kMaxS64 = std::numeric_limits<s64>::max();
 }
