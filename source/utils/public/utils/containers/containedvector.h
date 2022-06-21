@@ -42,6 +42,16 @@ namespace puma
             push_back( _element );
         }
 
+        const ElementType& back() const
+        {
+            return m_container[m_currentSize - 1];
+        }
+
+        ElementType& back()
+        {
+            return m_container[m_currentSize - 1];
+        }
+
         iterator erase(iterator _element) 
         { 
             assert( _element >= begin() ); // Iterator is outside of the container range
