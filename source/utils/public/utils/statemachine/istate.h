@@ -1,16 +1,17 @@
 #pragma once
 
+#include <utils/genericid.h>
 #include <utils/numerictypes.h>
 
 namespace puma
 {
-    using StateID = s32;
-    constexpr s32 kInvalidStateID = -1;
+
+    DECLARE_GENERIC_ID( StateId, s32, -1 );
 
     class StateMachineInfo
     {
     public:
-        StateID currentStateId = kInvalidStateID;
+        StateId currentStateId;
     };
 
     template <class SMInfo>
@@ -22,11 +23,11 @@ namespace puma
 
         using Info = SMInfo;
         
-        explicit IState(StateID _stateId)
+        explicit IState( StateId _stateId)
             : m_stateId (_stateId){}
         virtual ~IState() = default;
 
-        StateID getID() const { return m_stateId; };
+        StateId getId() const { return m_stateId; };
         
         virtual void onEnter( SMInfo& _info ) = 0;
         virtual void update ( SMInfo& _info ) = 0;
@@ -34,7 +35,7 @@ namespace puma
 
     protected:
 
-        const StateID m_stateId = kInvalidStateID;
+        const StateId m_stateId;
 
     };
 }

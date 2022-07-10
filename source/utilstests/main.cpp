@@ -1,9 +1,6 @@
 #include <gtest/gtest.h>
 #include <gmock/gmock.h>
 
-#include "tests/containers/uniquerealizationcontainertest.h"
-
-
 int main( int argc, char* argv[] )
 {
     ::testing::InitGoogleTest( &argc, argv );

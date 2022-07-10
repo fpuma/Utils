@@ -19,7 +19,7 @@ namespace puma
         {
             static_assert(std::is_base_of<BaseState, StateClass>::value);
             std::unique_ptr<StateClass> uPtr = std::make_unique<StateClass>();
-            m_states.emplace( std::make_pair( uPtr->getID(), std::move( uPtr ) ) );
+            m_states.emplace( std::make_pair( uPtr->getId(), std::move( uPtr ) ) );
         }
 
         void start( typename BaseState::Info& _info )
@@ -32,9 +32,9 @@ namespace puma
         {
             BaseState* currentState = getState( _info.currentStateId );
             currentState->update( _info );
-            StateID newStateId = _info.currentStateId;
+            StateId newStateId = _info.currentStateId;
 
-            if ( currentState->getID() != newStateId )
+            if ( currentState->getId() != newStateId )
             {
                 currentState->onExit( _info );
                 currentState = getState( newStateId );
@@ -49,11 +49,11 @@ namespace puma
             m_states.clear();
         }
 
-    private:
+    protected:
 
-        BaseState* getState( StateID _stateId )
+        BaseState* getState( StateId _stateId )
         {
-            assert( kInvalidStateID != _stateId );
+            assert( _stateId.isValid() );
 #ifdef _DEBUG
             auto itState = m_states.find( _stateId );
             assert( itState != m_states.end() );
@@ -63,6 +63,6 @@ namespace puma
             return result;
         }
 
-        std::map<StateID,std::unique_ptr<BaseState>> m_states;
+        std::map<StateId,std::unique_ptr<BaseState>> m_states;
     };
 }
