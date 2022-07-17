@@ -85,7 +85,7 @@ namespace puma
         }
 
         template<class T>
-        bool exists( Key _key ) const
+        bool contains( Key _key ) const
         {
             bool result = false;
 
@@ -93,7 +93,7 @@ namespace puma
 
             if ( m_elements.end() != itElement )
             {
-                result = itElement->second.exists<T>();
+                result = itElement->second.contains<T>();
             }
 
             return result;

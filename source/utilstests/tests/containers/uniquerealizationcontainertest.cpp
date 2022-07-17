@@ -32,16 +32,16 @@ TEST( Containers, UniqueRealizationContainer )
 
     //====================================================================================
 
-    EXPECT_FALSE( container.exists<TestRealization0>() );
-    EXPECT_FALSE( container.exists<TestRealization1>() );
+    EXPECT_FALSE( container.contains<TestRealization0>() );
+    EXPECT_FALSE( container.contains<TestRealization1>() );
 
     TestRealization0* testRealization0ptr = container.add<TestRealization0>();
     EXPECT_DEATH( container.add<ITestInterface>(), "itElement == m_elements.end" );
     TestRealization1* testRealization1ptr = container.add<TestRealization1>();
 
-    EXPECT_TRUE( container.exists<ITestInterface>() );
-    EXPECT_TRUE( container.exists<TestRealization0>() );
-    EXPECT_TRUE( container.exists<TestRealization1>() );
+    EXPECT_TRUE( container.contains<ITestInterface>() );
+    EXPECT_TRUE( container.contains<TestRealization0>() );
+    EXPECT_TRUE( container.contains<TestRealization1>() );
 
     EXPECT_EQ( container.size(), 2 );
 

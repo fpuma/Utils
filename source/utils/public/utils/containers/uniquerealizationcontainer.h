@@ -104,7 +104,7 @@ namespace puma
         }
 
         template<class T>
-        bool exists() const
+        bool contains() const
         {
             static_assert(std::is_base_of<BaseClass, T>::value);
             
@@ -115,7 +115,7 @@ namespace puma
             
             if ( itRegisteredClass != m_registeredClasses.end() )
             {
-                result = m_elements.find( itRegisteredClass->second ) != m_elements.end();
+                result = m_elements.contains( itRegisteredClass->second );
             }
 
             return result;

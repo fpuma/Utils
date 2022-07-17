@@ -4,7 +4,7 @@ namespace Puma
     class GoogleTest : Puma.Common.IExternBinaries
     {
         public GoogleTest()
-            : base("GTest", @"googletest-release-1.10.0")
+            : base("GTest", @"googletest-release-1.12.1")
         { }
 
         public override void ConfigureIncludes(Configuration conf, Sharpmake.Target target)
@@ -18,10 +18,10 @@ namespace Puma
 
             if (target.Optimization == Sharpmake.Optimization.Debug)
             {
-                conf.LibraryFiles.Add(@"gmock_maind.lib");
-                conf.LibraryFiles.Add(@"gmockd.lib");
-                conf.LibraryFiles.Add(@"gtest_maind.lib");
-                conf.LibraryFiles.Add(@"gtestd.lib");
+                conf.LibraryFiles.Add(@"gmock_main_d.lib");
+                conf.LibraryFiles.Add(@"gmock_d.lib");
+                conf.LibraryFiles.Add(@"gtest_main_d.lib");
+                conf.LibraryFiles.Add(@"gtest_d.lib");
 
             }
             else
