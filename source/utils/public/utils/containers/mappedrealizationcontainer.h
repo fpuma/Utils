@@ -63,12 +63,23 @@ namespace puma
         }
 
         template<class T>
-        T* get( Key _key ) const
+        T* get( Key _key )
         {
             static_assert(std::is_base_of<BaseClass, T>::value);
 
             auto itElement = m_elements.find( _key );
             assert( itElement != m_elements.end() ); //There are no elements for _key
+
+            return static_cast<T*>(itElement->second.get<T>());
+        }
+
+        template<class T>
+        const T* get(Key _key) const
+        {
+            static_assert(std::is_base_of<BaseClass, T>::value);
+
+            auto itElement = m_elements.find(_key);
+            assert(itElement != m_elements.end()); //There are no elements for _key
 
             return static_cast<T*>(itElement->second.get<T>());
         }

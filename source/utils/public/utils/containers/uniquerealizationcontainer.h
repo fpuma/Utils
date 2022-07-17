@@ -76,7 +76,7 @@ namespace puma
         }
 
         template<class T>
-        T* get() const
+        T* get()
         {
             static_assert(std::is_base_of<BaseClass, T>::value);
             auto typeIndex = std::type_index( typeid(T) );
@@ -86,6 +86,21 @@ namespace puma
 
             auto itElement = m_elements.find( itRegisteredClass->second );
             assert( itElement != m_elements.end() ); //There is no element of that type
+
+            return static_cast<T*>(itElement->second.get());
+        }
+
+        template<class T>
+        const T* get() const
+        {
+            static_assert(std::is_base_of<BaseClass, T>::value);
+            auto typeIndex = std::type_index(typeid(T));
+
+            auto itRegisteredClass = m_registeredClasses.find(typeIndex);
+            assert(itRegisteredClass != m_registeredClasses.end()); // The type has not been registered
+
+            auto itElement = m_elements.find(itRegisteredClass->second);
+            assert(itElement != m_elements.end()); //There is no element of that type
 
             return static_cast<T*>(itElement->second.get());
         }
@@ -141,21 +156,6 @@ namespace puma
             m_registeredClasses.emplace( realizedType, realizedType );
             m_factories.emplace( realizedType, []() { return std::make_unique<RealizedClass>(); } );
         }
-
-//        template<class InterfaceClass>
-//        void registerInterface( std::function<std::unique_ptr<InterfaceClass>()>&& _factory )
-//        {
-//            static_assert(std::is_base_of<BaseClass, InterfaceClass>::value);
-//
-//            auto interfaceType = std::type_index( typeid(InterfaceClass) );
-//
-//#ifdef _DEBUG
-//            auto itRegisteredClass = m_registeredClasses.find( interfaceType );
-//            assert( m_registeredClasses.end() == itRegisteredClass ); //That interface has already been registered
-//#endif
-//            m_registeredClasses.emplace( interfaceType, interfaceType );
-//            m_factories.emplace( interfaceType, std::move( _factory ) );
-//        }
 
         template<class RealizedClass>
         void registerClass()
