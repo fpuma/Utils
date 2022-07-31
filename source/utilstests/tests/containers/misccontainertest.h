@@ -3,6 +3,7 @@
 #include <gtest/gtest.h>
 #include <gmock/gmock.h>
 #include <utils/containers/uniquerealizationcontainer.h>
+#include <utils/containers/mappedrealizationcontainer.h>
 
 using namespace puma;
 
@@ -31,15 +32,15 @@ private:
     int m_num = 0;
 };
 
-class TestRealization1 : public ITestInterface
+class TestRealization1 : public ITestBase
 {
 public:
 
-    int get() const override { return m_num; }
-    void set( int _num ) override { m_num = _num; }
+    float get() const { return m_num; }
+    void set( float _num ) { m_num = _num; }
 
 private:
-    int m_num = 0;
+    float m_num = 0;
 };
 
 class TestContainerCallbacks
@@ -64,6 +65,6 @@ public:
 
 protected:
 
-    void onAdded( Key _key, ITestBase* _system ) { MockTest.onAdded(); }
-    void onRemoved( Key _key, ITestBase* _system ) { MockTest.onRemoved(); }
+    void onAdded( std::shared_ptr<ITestBase> _system ) override { MockTest.onAdded(); }
+    void onRemoved( std::shared_ptr<ITestBase> _system ) override { MockTest.onRemoved(); }
 };

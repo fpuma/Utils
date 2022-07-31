@@ -19,21 +19,17 @@ namespace puma
 
         MappedRealizationContainer() = default;
 
-        MappedRealizationContainer( const MappedRealizationContainer<Key, BaseClass>& _container )
-            : m_elements( _container.m_elements )
-            , m_containerRegistryTemplate( _container.m_containerRegistryTemplate )
-        {}
+        MappedRealizationContainer& operator =( const MappedRealizationContainer& _container ) = delete;
+        MappedRealizationContainer( const MappedRealizationContainer<Key, BaseClass>& _container ) = delete;
 
         MappedRealizationContainer( MappedRealizationContainer<Key, BaseClass>&& _container ) noexcept
             : m_elements( std::move( _container ) )
             , m_containerRegistryTemplate( std::move( _container ) )
         {}
 
-        MappedRealizationContainer& operator =( const MappedRealizationContainer& _container )
+        ~MappedRealizationContainer()
         {
-            m_elements = _container.m_elements;
-            m_containerRegistryTemplate = _container.m_containerRegistryTemplate;
-            return *this;
+            clear();
         }
 
         MappedRealizationContainer& operator =( const MappedRealizationContainer&& _container )
@@ -44,7 +40,7 @@ namespace puma
         }
 
         template<class T>
-        T* add( Key _key )
+        std::shared_ptr<T> add( Key _key )
         {
             static_assert(std::is_base_of<BaseClass, T>::value);
 
@@ -54,34 +50,50 @@ namespace puma
             {
                 auto emplaceResult = m_elements.emplace( _key, std::move( m_containerRegistryTemplate.cloneRegistriesOnly() ) );
                 assert( emplaceResult.second );
+                if (!emplaceResult.second) return nullptr;
 
                 itElement = emplaceResult.first;
-                assert( m_elements.end() != itElement );
             }
 
             return itElement->second.add<T>();
         }
-
         template<class T>
         T* get( Key _key )
         {
-            static_assert(std::is_base_of<BaseClass, T>::value);
-
             auto itElement = m_elements.find( _key );
             assert( itElement != m_elements.end() ); //There are no elements for _key
+            if (itElement == m_elements.end()) return nullptr;
 
-            return static_cast<T*>(itElement->second.get<T>());
+            return itElement->second.getSafely<T>().get();
+        }
+        template<class T>
+        const T* get( Key _key) const
+        {
+            auto itElement = m_elements.find( _key );
+            assert( itElement != m_elements.end() ); //There are no elements for _key
+            if (itElement == m_elements.end()) return nullptr;
+
+            return itElement->second.getSafely<T>().get();
         }
 
         template<class T>
-        const T* get(Key _key) const
+        std::shared_ptr<T> getSafely( Key _key )
         {
-            static_assert(std::is_base_of<BaseClass, T>::value);
+            auto itElement = m_elements.find( _key );
+            assert( itElement != m_elements.end() ); //There are no elements for _key
+            if (itElement == m_elements.end()) return nullptr;
 
-            auto itElement = m_elements.find(_key);
-            assert(itElement != m_elements.end()); //There are no elements for _key
+            return itElement->second.getSafely<T>();
+        }
 
-            return static_cast<T*>(itElement->second.get<T>());
+        template<class T>
+        std::shared_ptr<const T> getSafely( Key _key ) const
+        {
+            auto itElement = m_elements.find( _key );
+            assert( itElement != m_elements.end() ); //There are no elements for _key
+            if (itElement == m_elements.end()) return nullptr;
+
+            return itElement->second.getSafely<T>();
         }
 
         template<class T>
@@ -90,9 +102,12 @@ namespace puma
             static_assert(std::is_base_of<BaseClass, T>::value);
 
             auto itElement = m_elements.find( _key );
-            assert( m_elements.end() != itElement ); //The _key has no elements assigned
+            assert( itElement != m_elements.end() );
             
-            itElement->second.remove<T>();
+            if (itElement != m_elements.end())
+            {
+                itElement->second.remove<T>();
+            }
         }
 
         template<class T>
@@ -132,6 +147,12 @@ namespace puma
             }
         }
 
+        template<class ClassToCheck>
+        bool isRegistered()
+        {
+            return m_containerRegistryTemplate.isRegistered<ClassToCheck>();
+        }
+
         void clear()
         {
             m_elements.clear();
@@ -139,7 +160,9 @@ namespace puma
 
     private:
 
-        std::map<Key, UniqueRealizationContainer<BaseClass>> m_elements;
+        using ContainersMap = std::map<Key, UniqueRealizationContainer<BaseClass>>;
+
+        ContainersMap m_elements;
         UniqueRealizationContainer<BaseClass> m_containerRegistryTemplate;
 
     };

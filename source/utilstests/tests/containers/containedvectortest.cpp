@@ -18,8 +18,9 @@ TEST( Containers, ContainedVector )
     container.push_back( 4 );
 
     EXPECT_EQ( container.size(), 5 );
-
+#ifdef _DEBUG
     EXPECT_DEATH( container.push_back( 0 ), "m_currentSize < ContainerSize" );
+#endif
 
     container.erase( container.begin() + 2 );
 

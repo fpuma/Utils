@@ -15,12 +15,13 @@ namespace puma
     public:
 
         UniqueRealizationContainer() = default;
+        UniqueRealizationContainer( const UniqueRealizationContainer<BaseClass>& _container ) = delete;
+        UniqueRealizationContainer& operator =( const UniqueRealizationContainer<BaseClass>& _container ) = delete;
 
-        UniqueRealizationContainer( const UniqueRealizationContainer<BaseClass>& _container )
-            : m_elements( _container.m_elements)
-            , m_registeredClasses( _container.m_registeredClasses )
-            , m_factories( _container.m_factories )
-        {}
+        ~UniqueRealizationContainer()
+        {
+            clear();
+        }
 
         UniqueRealizationContainer( UniqueRealizationContainer<BaseClass>&& _container ) noexcept
             : m_elements( std::move( _container.m_elements ) )
@@ -28,14 +29,6 @@ namespace puma
             , m_factories( std::move( _container.m_factories ) )
         {}
 
-        UniqueRealizationContainer& operator =( const UniqueRealizationContainer<BaseClass>& _container )
-        {
-            m_elements = _container.m_elements;
-            m_registeredClasses = _container.m_registeredClasses;
-            m_factories = _container.m_factories;
-            return *this;
-        }
-        
         UniqueRealizationContainer& operator =( const UniqueRealizationContainer<BaseClass>&& _container )
         {
             m_elements = std::move(_container.m_elements);
@@ -50,72 +43,55 @@ namespace puma
         }
 
         template<class T>
-        T* add()
+        std::shared_ptr<T> add()
         {
             static_assert(std::is_base_of<BaseClass, T>::value);
             auto typeIndex = std::type_index( typeid(T) );
-
-            auto itElement = getElement<T>();
-            assert( itElement == m_elements.end() ); //An element of that type already exists
 
             auto itRegisteredClass = m_registeredClasses.find( typeIndex );
             assert( itRegisteredClass != m_registeredClasses.end() ); //The class or interface you are trying to add has not been registered
+            if (itRegisteredClass == m_registeredClasses.end()) return nullptr;
+
+            assert( !contains<T>() ); //An element of that type already exists
+            if (contains<T>()) return nullptr;
 
             auto itFactory = m_factories.find( itRegisteredClass->second );
             assert( itFactory != m_factories.end() ); //Could not find the factory
+            if (itFactory == m_factories.end()) return nullptr;
 
             auto emplaceResult = m_elements.emplace( itRegisteredClass->second, itFactory->second() );
-            assert( emplaceResult.second );
-
-            itElement = emplaceResult.first;
-            assert( m_elements.end() != itElement );
-
-            onAdded( itElement->first, itElement->second.get() );
-
-            return static_cast<T*>(itElement->second.get());
-        }
-
-        template<class T>
-        T* get()
-        {
-            static_assert(std::is_base_of<BaseClass, T>::value);
-            auto typeIndex = std::type_index( typeid(T) );
+            assert( emplaceResult.second ); // Failed to add the element or element already existed
+            if (!emplaceResult.second) return nullptr;
             
-            auto itRegisteredClass = m_registeredClasses.find( typeIndex );
-            assert( itRegisteredClass != m_registeredClasses.end() ); // The type has not been registered
-
-            auto itElement = m_elements.find( itRegisteredClass->second );
-            assert( itElement != m_elements.end() ); //There is no element of that type
-
-            return static_cast<T*>(itElement->second.get());
+            auto itElement = emplaceResult.first;
+            onAdded( itElement->second );
+            return static_pointer_cast<T>(itElement->second);
         }
 
         template<class T>
-        const T* get() const
-        {
-            static_assert(std::is_base_of<BaseClass, T>::value);
-            auto typeIndex = std::type_index(typeid(T));
+        T* get() { return getElement<T>().get(); }
 
-            auto itRegisteredClass = m_registeredClasses.find(typeIndex);
-            assert(itRegisteredClass != m_registeredClasses.end()); // The type has not been registered
+        template<class T>
+        const T* get() const { return getElement<T>().get(); }
 
-            auto itElement = m_elements.find(itRegisteredClass->second);
-            assert(itElement != m_elements.end()); //There is no element of that type
+        template<class T>
+        std::shared_ptr<T> getSafely() { return getElement<T>(); }
 
-            return static_cast<T*>(itElement->second.get());
-        }
+        template<class T>
+        std::shared_ptr<const T> getSafely() const { return getElement<T>(); }
 
         template<class T>
         void remove()
         {
             static_assert(std::is_base_of<BaseClass, T>::value);
             
-            auto itElement = getElement<T>();
-            assert( itElement != m_elements.end() ); //The element to be removed does not exist 
+            auto elementPtr = getElement<T>();
+            if (nullptr == elementPtr) return;
 
-            onRemoved( itElement->first, itElement->second.get() );
+            onRemoved( elementPtr );
 
-            m_elements.erase( itElement );
+            auto typeIndex = std::type_index( typeid(T) );
+            m_elements.erase( typeIndex );
         }
 
         template<class T>
@@ -154,7 +130,7 @@ namespace puma
 
             m_registeredClasses.emplace( interfaceType, realizedType );
             m_registeredClasses.emplace( realizedType, realizedType );
-            m_factories.emplace( realizedType, []() { return std::make_unique<RealizedClass>(); } );
+            m_factories.emplace( realizedType, []() { return std::make_shared<RealizedClass>(); } );
         }
 
         template<class RealizedClass>
@@ -165,31 +141,35 @@ namespace puma
             auto realizationType = std::type_index( typeid(RealizedClass) );
 #ifdef _DEBUG
             auto itRegisteredClass = m_registeredClasses.find( realizationType );
-            assert( itRegisteredClass == m_registeredClasses.end() ); //That interface has already been registered
+            assert( itRegisteredClass == m_registeredClasses.end() ); //That realization has already been registered
 #endif
             m_registeredClasses.emplace( realizationType, realizationType );
-            m_factories.emplace( realizationType, []() { return std::make_unique<RealizedClass>(); } );
+            m_factories.emplace( realizationType, []() { return std::make_shared<RealizedClass>(); } );
         }
 
         template<class ClassToCheck>
         bool isRegistered()
         {
             auto classType = std::type_index( typeid(ClassToCheck) );
-            
-            auto itRegisteredClass = m_registeredClasses.find( classType );
-            return m_registeredClasses.end() != itRegisteredClass;
+            return m_registeredClasses.contains( classType );
         }
 
-        void traverse( std::function<void( BaseClass* )> _function )
+        void traverse( std::function<void( std::shared_ptr<BaseClass> )> _function )
         {
             for ( auto itElement = m_elements.begin(); itElement != m_elements.end(); ++itElement )
             {
-                _function( itElement->second.get() );
+                _function( itElement->second );
             }
         }
 
         void clear()
         {
+#ifdef _DEBUG
+            traverse( []( std::shared_ptr<BaseClass> elementPtr )
+                {
+                    assert( 2 == elementPtr.use_count() ); //The container should be the owner of these obejcts. There is a shared_ptr to these objects that is still alive
+                } );
+#endif
             m_elements.clear();
         }
 
@@ -200,19 +180,17 @@ namespace puma
 
     protected:
 
-        using Key = std::type_index;
-
-        virtual void onAdded( Key _key, BaseClass* _system ) {}
-        virtual void onRemoved( Key _key, BaseClass* _system ) {}
+        virtual void onAdded( std::shared_ptr<BaseClass> _system ) {}
+        virtual void onRemoved( std::shared_ptr<BaseClass> _system ) {}
 
     private:
 
         using InterfaceID = std::type_index;
         using RealizationID = std::type_index;
 
-        using Elements = std::map<RealizationID, std::unique_ptr<BaseClass>>;
+        using Elements = std::map<RealizationID, std::shared_ptr<BaseClass>>;
         using RegisteredClassesMap = std::map<InterfaceID, RealizationID>;
-        using Factories = std::map<RealizationID, std::function<std::unique_ptr<BaseClass>()>>;
+        using Factories = std::map<RealizationID, std::function<std::shared_ptr<BaseClass>()>>;
 
         UniqueRealizationContainer( const UniqueRealizationContainer<BaseClass>& _container, bool _cloneRegistriesOnly )
             : m_elements()
@@ -221,12 +199,20 @@ namespace puma
         {}
 
         template<class T>
-        typename Elements::iterator getElement()
+        std::shared_ptr<T> getElement() const
         {
             static_assert(std::is_base_of<BaseClass, T>::value);
-            auto typeIndex = std::type_index( typeid(T) );
-            auto itRegisteredClass = m_registeredClasses.find( typeIndex );
-            return m_registeredClasses.end() == itRegisteredClass ? m_elements.end() : m_elements.find( itRegisteredClass->second );
+            std::type_index typeIndex = std::type_index( typeid(T) );
+
+            RegisteredClassesMap::const_iterator itRegisteredClass = m_registeredClasses.find( typeIndex );
+            assert( itRegisteredClass != m_registeredClasses.end() ); // The type has not been registered
+            if (itRegisteredClass == m_registeredClasses.end()) return nullptr;
+
+            auto itElement = m_elements.find( itRegisteredClass->second );
+            assert( itElement != m_elements.end() ); //There is no element of that type
+            if (itElement == m_elements.end()) return nullptr;
+
+            return static_pointer_cast<T>( itElement->second );
         }
 
         Elements m_elements;
