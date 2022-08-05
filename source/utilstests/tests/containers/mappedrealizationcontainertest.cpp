@@ -101,7 +101,7 @@ TEST( MappedRealizationContainer, Gets )
     std::shared_ptr<const ITestInterface> ptr3 = container.getSafely<ITestInterface>(0);
 
 #ifdef _DEBUG
-    EXPECT_DEATH( container.clear(), "2 == elementPtr.use_count" );
+    EXPECT_DEATH( container.clear(), "2 == elementPtr.second.use_count" );
 #endif
 
     EXPECT_NE( ptr0, ptr2.get() );
@@ -136,4 +136,41 @@ TEST( MappedRealizationContainer, Remove )
 
     EXPECT_FALSE( container.contains<TestRealization0>( 0 ) );
     EXPECT_FALSE( container.contains<TestRealization1>( 0 ) );
+}
+
+TEST( MappedRealizationContainer, Visit )
+{
+    MappedRealizationContainer<int, ITestBase> container;
+
+    container.registerInterface<ITestInterface, TestRealization0>();
+    container.registerClass<TestRealization1>();
+
+    int controlNumber = 0;
+
+    container.add<TestRealization0>(0);
+
+    container.visit( 0, [&controlNumber]( std::shared_ptr<ITestBase> _element )
+        {
+            controlNumber = _element->addOne( controlNumber );
+        } );
+
+    EXPECT_EQ( controlNumber, 1 );
+
+    container.add<TestRealization0>( 1 );
+
+    container.visit( 1, [&controlNumber]( std::shared_ptr<ITestBase> _element )
+        {
+            controlNumber = _element->addOne( controlNumber );
+        } );
+
+    EXPECT_EQ( controlNumber, 2 );
+
+    container.add<TestRealization1>( 1 );
+
+    container.visit( 1, [&controlNumber]( std::shared_ptr<ITestBase> _element )
+        {
+            controlNumber = _element->addOne( controlNumber );
+        } );
+
+    EXPECT_EQ( controlNumber, 4 );
 }

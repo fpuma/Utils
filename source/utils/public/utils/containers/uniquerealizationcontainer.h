@@ -1,5 +1,6 @@
 #pragma once
 
+#include <algorithm>
 #include <assert.h>
 #include <functional>
 #include <map>
@@ -154,7 +155,7 @@ namespace puma
             return m_registeredClasses.contains( classType );
         }
 
-        void traverse( std::function<void( std::shared_ptr<BaseClass> )> _function )
+        void visit( std::function<void( std::shared_ptr<BaseClass> )> _function )
         {
             for ( auto itElement = m_elements.begin(); itElement != m_elements.end(); ++itElement )
             {
@@ -164,12 +165,11 @@ namespace puma
 
         void clear()
         {
-#ifdef _DEBUG
-            traverse( []( std::shared_ptr<BaseClass> elementPtr )
+            assert( std::all_of( m_elements.begin(), m_elements.end(), []( Elements::value_type elementPtr )
                 {
-                    assert( 2 == elementPtr.use_count() ); //The container should be the owner of these obejcts. There is a shared_ptr to these objects that is still alive
-                } );
-#endif
+                    return 2 == elementPtr.second.use_count();
+                } ) );
+
             m_elements.clear();
         }
 

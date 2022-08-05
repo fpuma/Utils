@@ -102,7 +102,7 @@ namespace puma
             static_assert(std::is_base_of<BaseClass, T>::value);
 
             auto itElement = m_elements.find( _key );
-            assert( itElement != m_elements.end() );
+            assert( itElement != m_elements.end() ); //There are no elements for _key
             
             if (itElement != m_elements.end())
             {
@@ -151,6 +151,14 @@ namespace puma
         bool isRegistered()
         {
             return m_containerRegistryTemplate.isRegistered<ClassToCheck>();
+        }
+
+        void visit( Key _key, std::function<void( std::shared_ptr<BaseClass> )> _function )
+        {
+            auto itElement = m_elements.find( _key );
+            assert( itElement != m_elements.end() ); //There are no elements for _key
+
+            itElement->second.visit( _function );
         }
 
         void clear()

@@ -102,7 +102,7 @@ TEST( UniqueRealizationContainer, Gets )
     std::shared_ptr<const ITestInterface> ptr3 = container.getSafely<ITestInterface>();
 
 #ifdef _DEBUG
-    EXPECT_DEATH( container.clear(), "2 == elementPtr.use_count" );
+    EXPECT_DEATH( container.clear(), "2 == elementPtr.second.use_count" );
 #endif
 
     EXPECT_EQ( ptr0, ptr1 );
@@ -135,4 +135,34 @@ TEST( UniqueRealizationContainer, Remove )
     container.remove<TestRealization0>();
     EXPECT_EQ( container.size(), 0 );
     EXPECT_FALSE( container.contains<TestRealization1>() );
+}
+
+TEST( UniqueRealizationContainer, Visit )
+{
+    TestUniqueRealizationContainer container;
+
+    container.registerInterface<ITestInterface, TestRealization0>();
+    container.registerClass<TestRealization1>();
+
+    EXPECT_CALL( container.MockTest, onAdded() ).Times( 2 );
+
+    int controlNumber = 0;
+
+    container.add<TestRealization0>();
+
+    container.visit( [&controlNumber]( std::shared_ptr<ITestBase> _element )
+        {
+            controlNumber = _element->addOne( controlNumber );
+        } );
+
+    EXPECT_EQ( controlNumber, 1 );
+
+    container.add<TestRealization1>();
+
+    container.visit( [&controlNumber]( std::shared_ptr<ITestBase> _element )
+        {
+            controlNumber = _element->addOne( controlNumber );
+        } );
+
+    EXPECT_EQ( controlNumber, 3 );
 }

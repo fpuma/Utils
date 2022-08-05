@@ -11,6 +11,8 @@ class ITestBase
 {
 public:
     virtual ~ITestBase() {}
+
+    int addOne( int num ) const { return ++num; }
 };
 
 class ITestInterface : public ITestBase
