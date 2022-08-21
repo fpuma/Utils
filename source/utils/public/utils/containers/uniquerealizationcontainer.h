@@ -3,9 +3,9 @@
 #include <algorithm>
 #include <assert.h>
 #include <functional>
-#include <map>
 #include <memory>
 #include <typeindex>
+#include <unordered_map>
 
 namespace puma
 {
@@ -80,6 +80,12 @@ namespace puma
 
         template<class T>
         std::shared_ptr<const T> getSafely() const { return getElement<T>(); }
+
+ 
+        BaseClass* get( std::type_index _typeIndex ) { return getElement( _typeIndex ).get(); }
+        const BaseClass* get( std::type_index _typeIndex ) const { return getElement( _typeIndex ).get(); }
+        std::shared_ptr<BaseClass> getSafely( std::type_index _typeIndex ) { return getElement( _typeIndex ); }
+        std::shared_ptr<const BaseClass> getSafely( std::type_index _typeIndex ) const { return getElement( _typeIndex ); }
 
         template<class T>
         void remove()
@@ -188,9 +194,9 @@ namespace puma
         using InterfaceID = std::type_index;
         using RealizationID = std::type_index;
 
-        using Elements = std::map<RealizationID, std::shared_ptr<BaseClass>>;
-        using RegisteredClassesMap = std::map<InterfaceID, RealizationID>;
-        using Factories = std::map<RealizationID, std::function<std::shared_ptr<BaseClass>()>>;
+        using Elements = std::unordered_map<RealizationID, std::shared_ptr<BaseClass>>;
+        using RegisteredClassesMap = std::unordered_map<InterfaceID, RealizationID>;
+        using Factories = std::unordered_map<RealizationID, std::function<std::shared_ptr<BaseClass>()>>;
 
         UniqueRealizationContainer( const UniqueRealizationContainer<BaseClass>& _container, bool _cloneRegistriesOnly )
             : m_elements()
@@ -203,8 +209,12 @@ namespace puma
         {
             static_assert(std::is_base_of<BaseClass, T>::value);
             std::type_index typeIndex = std::type_index( typeid(T) );
+            return static_pointer_cast<T>(getElement( typeIndex ));
+        }
 
-            RegisteredClassesMap::const_iterator itRegisteredClass = m_registeredClasses.find( typeIndex );
+        std::shared_ptr<BaseClass> getElement( std::type_index _typeIndex ) const
+        {
+            RegisteredClassesMap::const_iterator itRegisteredClass = m_registeredClasses.find( _typeIndex );
             assert( itRegisteredClass != m_registeredClasses.end() ); // The type has not been registered
             if (itRegisteredClass == m_registeredClasses.end()) return nullptr;
 
@@ -212,7 +222,7 @@ namespace puma
             assert( itElement != m_elements.end() ); //There is no element of that type
             if (itElement == m_elements.end()) return nullptr;
 
-            return static_pointer_cast<T>( itElement->second );
+            return itElement->second;
         }
 
         Elements m_elements;

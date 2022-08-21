@@ -108,6 +108,17 @@ TEST( UniqueRealizationContainer, Gets )
     EXPECT_EQ( ptr0, ptr1 );
     EXPECT_EQ( ptr2, ptr3 );
     EXPECT_EQ( ptr1, ptr2.get() );
+
+    ITestBase* ptr4 = container.get( std::type_index( typeid(TestRealization0) ) );
+    const ITestBase* ptr5 = container.get( std::type_index( typeid(ITestInterface) ) );
+
+    std::shared_ptr<ITestBase> ptr6 = container.getSafely( std::type_index( typeid(TestRealization0) ) );
+    std::shared_ptr<const ITestBase> ptr7 = container.getSafely( std::type_index( typeid(ITestInterface) ) );
+
+    EXPECT_EQ( ptr4, ptr0 );
+    EXPECT_EQ( ptr4, ptr5 );
+    EXPECT_EQ( ptr6, ptr7 );
+    EXPECT_EQ( ptr5, ptr6.get() );
 }
 
 TEST( UniqueRealizationContainer, Remove )
