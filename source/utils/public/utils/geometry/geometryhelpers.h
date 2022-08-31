@@ -21,11 +21,10 @@ namespace puma
             return (_radians * 180.0f) / PI;
         }
 
-        static Vec2 rotatePoint2D( const Vec2& _point, const float& _degrees )
+        static Vec2 rotatePoint2D( const Vec2& _point, const float& _radians )
         {
-            float radians = degreesToRadians( _degrees );
-            return { (_point.x * std::cosf( radians )) - (_point.y * std::sinf( radians )),
-                     (_point.y * std::cosf( radians )) + (_point.x * std::sinf( radians )) };
+            return { (_point.x * std::cosf( _radians )) - (_point.y * std::sinf( _radians )),
+                     (_point.y * std::cosf( _radians )) + (_point.x * std::sinf( _radians )) };
         }
     };
 }
