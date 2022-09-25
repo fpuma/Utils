@@ -107,6 +107,10 @@ namespace puma
             if (itElement != m_elements.end())
             {
                 itElement->second.remove<T>();
+                if (itElement->second.size() == 0)
+                {
+                    m_elements.erase( itElement );
+                }
             }
         }
 
@@ -148,7 +152,7 @@ namespace puma
         }
 
         template<class ClassToCheck>
-        bool isRegistered()
+        bool isRegistered() const
         {
             return m_containerRegistryTemplate.isRegistered<ClassToCheck>();
         }
@@ -164,6 +168,11 @@ namespace puma
         void clear()
         {
             m_elements.clear();
+        }
+
+        size_t size() const
+        {
+            return m_elements.size();
         }
 
     private:

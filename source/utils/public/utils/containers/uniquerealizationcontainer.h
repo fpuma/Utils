@@ -92,13 +92,22 @@ namespace puma
         {
             static_assert(std::is_base_of<BaseClass, T>::value);
             
-            auto elementPtr = getElement<T>();
-            if (nullptr == elementPtr) return;
+            RegisteredClassesMap::const_iterator itRegisteredClass = m_registeredClasses.find( std::type_index( typeid(T) ) );
+            assert( itRegisteredClass != m_registeredClasses.end() ); // The type has not been registered
+            if (itRegisteredClass == m_registeredClasses.end()) return;
 
+            std::type_index ti = itRegisteredClass->second;
+
+            auto itElement = m_elements.find( ti );
+            assert( itElement != m_elements.end() ); //There is no element of that type
+            if (itElement == m_elements.end()) return;
+
+            auto elementPtr = itElement->second;
+            if (nullptr == elementPtr) return;
             onRemoved( elementPtr );
 
             auto typeIndex = std::type_index( typeid(T) );
-            m_elements.erase( typeIndex );
+            m_elements.erase( ti );
         }
 
         template<class T>
@@ -155,7 +164,7 @@ namespace puma
         }
 
         template<class ClassToCheck>
-        bool isRegistered()
+        bool isRegistered() const
         {
             auto classType = std::type_index( typeid(ClassToCheck) );
             return m_registeredClasses.contains( classType );
@@ -179,7 +188,7 @@ namespace puma
             m_elements.clear();
         }
 
-        size_t size()
+        size_t size() const
         {
             return m_elements.size();
         }

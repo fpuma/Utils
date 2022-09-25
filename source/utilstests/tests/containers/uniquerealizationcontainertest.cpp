@@ -133,7 +133,7 @@ TEST( UniqueRealizationContainer, Remove )
     container.remove<TestRealization1>();
 #endif
 
-    EXPECT_CALL( container.MockTest, onAdded() ).Times( 1 );
+    EXPECT_CALL( container.MockTest, onAdded() ).Times( 2 );
     EXPECT_EQ( container.size(), 0 );
     container.add<ITestInterface>();
     EXPECT_EQ( container.size(), 1 );
@@ -142,10 +142,14 @@ TEST( UniqueRealizationContainer, Remove )
 #else
     container.remove<TestRealization1>();
 #endif
-    EXPECT_CALL( container.MockTest, onRemoved() ).Times( 1 );
+    EXPECT_CALL( container.MockTest, onRemoved() ).Times( 2 );
     container.remove<TestRealization0>();
     EXPECT_EQ( container.size(), 0 );
     EXPECT_FALSE( container.contains<TestRealization1>() );
+    
+    container.add<TestRealization0>();
+    container.remove<ITestInterface>();
+    EXPECT_EQ( container.size(), 0 );
 }
 
 TEST( UniqueRealizationContainer, Visit )
