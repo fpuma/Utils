@@ -1,8 +1,6 @@
 #pragma once
 
-#include <cstdlib>
-#include <ctime>
-
+#include <random>
 
 namespace puma
 {
@@ -10,15 +8,19 @@ namespace puma
     {
     public:
         
-        static void refreshSeed()
+        void refreshSeed( unsigned int _seed)
         {
-            std::srand( (unsigned int) std::time( nullptr ) );
+            m_gen.seed( _seed );
         }
 
-        static int generateRandom( unsigned int _min, unsigned int _max )
+        int generateRandom( int _min, int _max )
         {
-            return _min + std::rand() / ((RAND_MAX + _min) / _max);
+            std::uniform_int_distribution<int> distribution( _min, _max );
+            return distribution( m_gen );
         }
 
+    private:
+
+        std::mt19937 m_gen;
     };
 }
