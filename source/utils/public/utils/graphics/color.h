@@ -14,5 +14,13 @@ namespace puma
         static Color Blue() { return { 0,   0, 255, 255 }; }
         static Color Black() { return { 0,   0,   0, 255 }; }
         static Color White() { return { 255, 255, 255, 255 }; }
+
+        bool operator == ( const Color& _other ) const
+        {
+            return  red == _other.red &&
+                green == _other.green &&
+                blue == _other.blue &&
+                alpha == _other.alpha;
+        }
     };
 }
