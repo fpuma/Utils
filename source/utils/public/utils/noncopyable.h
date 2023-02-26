@@ -10,6 +10,6 @@ namespace puma
 
     protected:
         NonCopyable(){}
-        ~NonCopyable() {}
+        virtual ~NonCopyable(){}
     };
 }

@@ -1,5 +1,7 @@
 #pragma once
 
+#include <functional>
+
 namespace puma
 {
     template <class IDType, IDType InvalidValue >
@@ -28,11 +30,21 @@ namespace puma
     };
 }
 
-#define DECLARE_GENERIC_ID(ID_NAME, ID_TYPE, INVALID_ID_VALUE)     class ID_NAME : public puma::GenericId<ID_TYPE, INVALID_ID_VALUE>\
+#define DECLARE_GENERIC_ID(ID_NAME, ID_TYPE, INVALID_ID_VALUE)\
+class ID_NAME : public puma::GenericId<ID_TYPE, INVALID_ID_VALUE>\
 {\
 public:\
     ID_NAME() {}\
     explicit ID_NAME( ID_TYPE _id )\
         : GenericId( _id )\
     {}\
+};\
+\
+template<>\
+struct std::hash<ID_NAME>\
+{\
+    size_t operator()(const ID_NAME& id) const\
+    {\
+        return std::hash<ID_TYPE>()(id.value());\
+    }\
 };

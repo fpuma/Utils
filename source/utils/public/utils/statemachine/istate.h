@@ -5,8 +5,13 @@
 
 namespace puma
 {
+    class StateId;
+}
 
-    DECLARE_GENERIC_ID( StateId, s32, -1 );
+DECLARE_GENERIC_ID( puma::StateId, puma::s32, -1 );
+
+namespace puma
+{
 
     class StateMachineInfo
     {
