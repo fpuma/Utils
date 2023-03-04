@@ -43,91 +43,6 @@ namespace puma
             return UniqueRealizationContainer<BaseClass>( *this, true );
         }
 
-        template<class T>
-        std::shared_ptr<T> add()
-        {
-            static_assert(std::is_base_of<BaseClass, T>::value);
-            auto typeIndex = std::type_index( typeid(T) );
-
-            auto itRegisteredClass = m_registeredClasses.find( typeIndex );
-            assert( itRegisteredClass != m_registeredClasses.end() ); //The class or interface you are trying to add has not been registered
-            if (itRegisteredClass == m_registeredClasses.end()) return nullptr;
-
-            assert( !contains<T>() ); //An element of that type already exists
-            if (contains<T>()) return nullptr;
-
-            auto itFactory = m_factories.find( itRegisteredClass->second );
-            assert( itFactory != m_factories.end() ); //Could not find the factory
-            if (itFactory == m_factories.end()) return nullptr;
-
-            auto emplaceResult = m_elements.emplace( itRegisteredClass->second, itFactory->second() );
-            assert( emplaceResult.second ); // Failed to add the element or element already existed
-            if (!emplaceResult.second) return nullptr;
-            
-            auto itElement = emplaceResult.first;
-            onAdded( itElement->second );
-            return static_pointer_cast<T>(itElement->second);
-        }
-
-        template<class T>
-        T* get() { return getElement<T>().get(); }
-
-        template<class T>
-        const T* get() const { return getElement<T>().get(); }
-
-        template<class T>
-        std::shared_ptr<T> getSafely() { return getElement<T>(); }
-
-        template<class T>
-        std::shared_ptr<const T> getSafely() const { return getElement<T>(); }
-
- 
-        BaseClass* get( std::type_index _typeIndex ) { return getElement( _typeIndex ).get(); }
-        const BaseClass* get( std::type_index _typeIndex ) const { return getElement( _typeIndex ).get(); }
-        std::shared_ptr<BaseClass> getSafely( std::type_index _typeIndex ) { return getElement( _typeIndex ); }
-        std::shared_ptr<const BaseClass> getSafely( std::type_index _typeIndex ) const { return getElement( _typeIndex ); }
-
-        template<class T>
-        void remove()
-        {
-            static_assert(std::is_base_of<BaseClass, T>::value);
-            
-            RegisteredClassesMap::const_iterator itRegisteredClass = m_registeredClasses.find( std::type_index( typeid(T) ) );
-            assert( itRegisteredClass != m_registeredClasses.end() ); // The type has not been registered
-            if (itRegisteredClass == m_registeredClasses.end()) return;
-
-            std::type_index ti = itRegisteredClass->second;
-
-            auto itElement = m_elements.find( ti );
-            assert( itElement != m_elements.end() ); //There is no element of that type
-            if (itElement == m_elements.end()) return;
-
-            auto elementPtr = itElement->second;
-            if (nullptr == elementPtr) return;
-            onRemoved( elementPtr );
-
-            auto typeIndex = std::type_index( typeid(T) );
-            m_elements.erase( ti );
-        }
-
-        template<class T>
-        bool contains() const
-        {
-            static_assert(std::is_base_of<BaseClass, T>::value);
-            
-            bool result = false;
-
-            auto typeIndex = std::type_index( typeid(T) );
-            auto itRegisteredClass = m_registeredClasses.find( typeIndex );
-            
-            if ( itRegisteredClass != m_registeredClasses.end() )
-            {
-                result = m_elements.contains( itRegisteredClass->second );
-            }
-
-            return result;
-        }
-
         template<class InterfaceClass, class RealizedClass>
         void registerInterface()
         {
@@ -170,6 +85,106 @@ namespace puma
             return m_registeredClasses.contains( classType );
         }
 
+        template<class T>
+        std::shared_ptr<T> add()
+        {
+            static_assert(std::is_base_of<BaseClass, T>::value);
+            auto typeIndex = std::type_index( typeid(T) );
+
+            return static_pointer_cast<T>(add( typeIndex ));
+        }
+
+        std::shared_ptr<BaseClass> add( std::type_index _typeIndex )
+        {
+            auto itRegisteredClass = m_registeredClasses.find( _typeIndex );
+            assert( itRegisteredClass != m_registeredClasses.end() ); //The class or interface you are trying to add has not been registered
+            if (itRegisteredClass == m_registeredClasses.end()) return nullptr;
+
+            assert( !contains( _typeIndex ) ); //An element of that type already exists
+            if (contains( _typeIndex )) return nullptr;
+
+            auto itFactory = m_factories.find( itRegisteredClass->second );
+            assert( itFactory != m_factories.end() ); //Could not find the factory
+            if (itFactory == m_factories.end()) return nullptr;
+
+            auto emplaceResult = m_elements.emplace( itRegisteredClass->second, itFactory->second() );
+            assert( emplaceResult.second ); // Failed to add the element or element already existed
+            if (!emplaceResult.second) return nullptr;
+
+            auto itElement = emplaceResult.first;
+            onAdded( itElement->second, _typeIndex );
+            return itElement->second;
+        }
+
+        template<class T>
+        void remove()
+        {
+            static_assert(std::is_base_of<BaseClass, T>::value);
+            
+            auto typeIndex = std::type_index( typeid(T) );
+            remove( typeIndex );
+        }
+
+        void remove( std::type_index _typeIndex )
+        {
+            RegisteredClassesMap::const_iterator itRegisteredClass = m_registeredClasses.find( _typeIndex );
+            assert( itRegisteredClass != m_registeredClasses.end() ); // The type has not been registered
+            if (itRegisteredClass == m_registeredClasses.end()) return;
+
+            std::type_index ti = itRegisteredClass->second;
+
+            auto itElement = m_elements.find( ti );
+            assert( itElement != m_elements.end() ); //There is no element of that type
+            if (itElement == m_elements.end()) return;
+
+            auto elementPtr = itElement->second;
+            if (nullptr == elementPtr) return;
+            onRemoved( elementPtr, _typeIndex );
+
+            m_elements.erase( ti );
+        }
+
+        template<class T>
+        bool contains() const
+        {
+            static_assert(std::is_base_of<BaseClass, T>::value);
+
+            auto typeIndex = std::type_index( typeid(T) );
+            return contains( typeIndex );
+        }
+
+        bool contains( std::type_index _typeIndex ) const
+        {
+            bool result = false;
+
+            auto itRegisteredClass = m_registeredClasses.find( _typeIndex );
+
+            if (itRegisteredClass != m_registeredClasses.end())
+            {
+                result = m_elements.contains( itRegisteredClass->second );
+            }
+
+            return result;
+        }
+
+        template<class T>
+        T* get() { return getElement<T>().get(); }
+
+        template<class T>
+        const T* get() const { return getElement<T>().get(); }
+
+        template<class T>
+        std::shared_ptr<T> getSafely() { return getElement<T>(); }
+
+        template<class T>
+        std::shared_ptr<const T> getSafely() const { return getElement<T>(); }
+
+ 
+        BaseClass* get( std::type_index _typeIndex ) { return getElement( _typeIndex ).get(); }
+        const BaseClass* get( std::type_index _typeIndex ) const { return getElement( _typeIndex ).get(); }
+        std::shared_ptr<BaseClass> getSafely( std::type_index _typeIndex ) { return getElement( _typeIndex ); }
+        std::shared_ptr<const BaseClass> getSafely( std::type_index _typeIndex ) const { return getElement( _typeIndex ); }
+
         void visit( std::function<void( std::shared_ptr<BaseClass> )> _function )
         {
             for ( auto itElement = m_elements.begin(); itElement != m_elements.end(); ++itElement )
@@ -195,8 +210,8 @@ namespace puma
 
     protected:
 
-        virtual void onAdded( std::shared_ptr<BaseClass> _system ) {}
-        virtual void onRemoved( std::shared_ptr<BaseClass> _system ) {}
+        virtual void onAdded( std::shared_ptr<BaseClass> _system, std::type_index _typeIndex ) {}
+        virtual void onRemoved( std::shared_ptr<BaseClass> _system, std::type_index _typeIndex ) {}
 
     private:
 

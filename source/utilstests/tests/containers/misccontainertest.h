@@ -67,6 +67,6 @@ public:
 
 protected:
 
-    void onAdded( std::shared_ptr<ITestBase> _system ) override { MockTest.onAdded(); }
-    void onRemoved( std::shared_ptr<ITestBase> _system ) override { MockTest.onRemoved(); }
+    void onAdded( std::shared_ptr<ITestBase> _system, std::type_index _typeIndex ) override { MockTest.onAdded(); }
+    void onRemoved( std::shared_ptr<ITestBase> _system, std::type_index _typeIndex ) override { MockTest.onRemoved(); }
 };

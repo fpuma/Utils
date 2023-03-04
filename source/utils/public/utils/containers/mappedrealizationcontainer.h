@@ -55,8 +55,12 @@ namespace puma
                 itElement = emplaceResult.first;
             }
 
-            return itElement->second.add<T>();
+            auto result = itElement->second.add<T>();
+
+            onAdded( _key, result, std::type_index( typeid(T) ) );
+            return result;
         }
+
         template<class T>
         T* get( Key _key )
         {
@@ -66,6 +70,7 @@ namespace puma
 
             return itElement->second.getSafely<T>().get();
         }
+
         template<class T>
         const T* get( Key _key) const
         {
@@ -106,6 +111,7 @@ namespace puma
             
             if (itElement != m_elements.end())
             {
+                onRemoved( _key, itElement->second.getSafely<T>(), std::type_index(typeid(T)));
                 itElement->second.remove<T>();
                 if (itElement->second.size() == 0)
                 {
@@ -174,6 +180,11 @@ namespace puma
         {
             return m_elements.size();
         }
+
+    protected:
+
+        virtual void onAdded( Key, std::shared_ptr<BaseClass>, std::type_index ) {}
+        virtual void onRemoved( Key, std::shared_ptr<BaseClass>, std::type_index ) {}
 
     private:
 
