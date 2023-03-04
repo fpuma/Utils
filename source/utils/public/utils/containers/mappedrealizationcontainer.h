@@ -120,6 +120,11 @@ namespace puma
             }
         }
 
+        bool contains( Key _key ) const
+        {
+            return m_elements.contains( _key );
+        }
+
         template<class T>
         bool contains( Key _key ) const
         {
@@ -166,9 +171,10 @@ namespace puma
         void visit( Key _key, std::function<void( std::shared_ptr<BaseClass> )> _function )
         {
             auto itElement = m_elements.find( _key );
-            assert( itElement != m_elements.end() ); //There are no elements for _key
-
-            itElement->second.visit( _function );
+            if (itElement != m_elements.end())
+            {
+                itElement->second.visit( _function );
+            }
         }
 
         void clear()
