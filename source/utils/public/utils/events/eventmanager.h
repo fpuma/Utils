@@ -13,6 +13,7 @@ namespace puma
 
         using EventListener = IEventListener<BaseEvent>;
 
+        EventManager() = default;
         virtual ~EventManager() = default;
 
         template<class EventType>
