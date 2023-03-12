@@ -19,7 +19,7 @@ namespace puma
         UniqueRealizationContainer( const UniqueRealizationContainer<BaseClass>& _container ) = delete;
         UniqueRealizationContainer& operator =( const UniqueRealizationContainer<BaseClass>& _container ) = delete;
 
-        ~UniqueRealizationContainer()
+        virtual ~UniqueRealizationContainer()
         {
             clear();
         }
@@ -138,6 +138,8 @@ namespace puma
             if (itElement == m_elements.end()) return;
 
             auto elementPtr = itElement->second;
+            assert( nullptr != elementPtr ); //There should not be a nullptr element
+            assert( elementPtr.use_count() == 2 ); //This container is supposed to be the owner of this element. We should be removing the last reference to it.
             if (nullptr == elementPtr) return;
             onRemoved( elementPtr, _typeIndex );
 

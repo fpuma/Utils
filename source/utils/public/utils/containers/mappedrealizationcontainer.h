@@ -27,7 +27,7 @@ namespace puma
             , m_containerRegistryTemplate( std::move( _container ) )
         {}
 
-        ~MappedRealizationContainer()
+        virtual ~MappedRealizationContainer()
         {
             clear();
         }
@@ -136,7 +136,11 @@ namespace puma
 
             auto result = itElement->second.add( _typeIndex );
 
-            onAdded( _key, result, _typeIndex );
+            if (nullptr != result)
+            {
+                onAdded( _key, result, _typeIndex );
+            }
+
             return result;
         }
 
@@ -232,8 +236,7 @@ namespace puma
 
     private:
 
-        using ContainersMap = std::map<Key, UniqueRealizationContainer<BaseClass>>;
-
+        using ContainersMap = std::unordered_map<Key, UniqueRealizationContainer<BaseClass>>;
         ContainersMap m_elements;
         UniqueRealizationContainer<BaseClass> m_containerRegistryTemplate;
 
