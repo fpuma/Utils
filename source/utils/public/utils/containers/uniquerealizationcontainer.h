@@ -62,6 +62,7 @@ namespace puma
             m_registeredClasses.emplace( interfaceType, realizedType );
             m_registeredClasses.emplace( realizedType, realizedType );
             m_factories.emplace( realizedType, []() { return std::make_shared<RealizedClass>(); } );
+            onInterfaceRegistered( interfaceType, realizedType );
         }
 
         template<class RealizedClass>
@@ -76,6 +77,7 @@ namespace puma
 #endif
             m_registeredClasses.emplace( realizationType, realizationType );
             m_factories.emplace( realizationType, []() { return std::make_shared<RealizedClass>(); } );
+            onClassRegistered( realizationType );
         }
 
         template<class ClassToCheck>
@@ -214,6 +216,8 @@ namespace puma
 
         virtual void onAdded( std::shared_ptr<BaseClass> _system, std::type_index _typeIndex ) {}
         virtual void onRemoved( std::shared_ptr<BaseClass> _system, std::type_index _typeIndex ) {}
+        virtual void onClassRegistered( std::type_index _typeIndex ) {}
+        virtual void onInterfaceRegistered( std::type_index _interfaceTypeIndex, std::type_index _classTypeIndex ) {}
 
     private:
 

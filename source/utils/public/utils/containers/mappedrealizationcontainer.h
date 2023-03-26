@@ -48,6 +48,7 @@ namespace puma
             {
                 itElement->second.registerInterface<InterfaceClass, RealizedClass>();
             }
+            onInterfaceRegistered( std::type_index( typeid(InterfaceClass) ), std::type_index( typeid(RealizedClass) ) );
         }
 
         template<class RealizedClass>
@@ -59,6 +60,7 @@ namespace puma
             {
                 itElement->second.registerClass<RealizedClass>();
             }
+            onClassRegistered( std::type_index( typeid(RealizedClass) ) );
         }
 
         template<class ClassToCheck>
@@ -233,6 +235,8 @@ namespace puma
 
         virtual void onAdded( Key, std::shared_ptr<BaseClass>, std::type_index ) {}
         virtual void onRemoved( Key, std::shared_ptr<BaseClass>, std::type_index ) {}
+        virtual void onClassRegistered( std::type_index _typeIndex ) {}
+        virtual void onInterfaceRegistered( std::type_index _interfaceTypeIndex, std::type_index _classTypeIndex ) {}
 
     private:
 
