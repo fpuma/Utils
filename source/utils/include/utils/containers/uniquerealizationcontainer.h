@@ -93,7 +93,7 @@ namespace puma
             static_assert(std::is_base_of<BaseClass, T>::value);
             auto typeIndex = std::type_index( typeid(T) );
 
-            return static_pointer_cast<T>(add( typeIndex ));
+            return std::static_pointer_cast<T>(add( typeIndex ));
         }
 
         std::shared_ptr<BaseClass> add( std::type_index _typeIndex )
@@ -239,7 +239,7 @@ namespace puma
         {
             static_assert(std::is_base_of<BaseClass, T>::value);
             std::type_index typeIndex = std::type_index( typeid(T) );
-            return static_pointer_cast<T>(getElement( typeIndex ));
+            return std::static_pointer_cast<T>(getElement( typeIndex ));
         }
 
         std::shared_ptr<BaseClass> getElement( std::type_index _typeIndex ) const

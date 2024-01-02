@@ -73,7 +73,7 @@ namespace puma
         std::shared_ptr<T> add( Key _key )
         {
             static_assert(std::is_base_of<BaseClass, T>::value);
-            return static_pointer_cast<T>(add( _key, std::type_index( typeid(T) ) ));
+            return std::static_pointer_cast<T>(add( _key, std::type_index( typeid(T) ) ));
         }
 
         template<class T>
@@ -101,14 +101,14 @@ namespace puma
         std::shared_ptr<T> getSafely( Key _key )
         {
             static_assert(std::is_base_of<BaseClass, T>::value);
-            return static_pointer_cast<T>(getSafely( _key, std::type_index( typeid(T) ) ));
+            return std::static_pointer_cast<T>(getSafely( _key, std::type_index( typeid(T) ) ));
         }
 
         template<class T>
         std::shared_ptr<const T> getSafely( Key _key ) const
         {
             static_assert(std::is_base_of<BaseClass, T>::value);
-            return static_pointer_cast<const T>(getSafely( _key, std::type_index( typeid(T) ) ));
+            return std::static_pointer_cast<const T>(getSafely( _key, std::type_index( typeid(T) ) ));
         }
 
         bool contains( Key _key ) const
