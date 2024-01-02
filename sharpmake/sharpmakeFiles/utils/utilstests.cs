@@ -1,11 +1,13 @@
 namespace Puma
 {
     [Sharpmake.Generate]
-    class UtilsTests : Puma.Common.IMyApplication
+    class UtilsTests : Puma.SharpmakeBase.IApplication
     {
         public UtilsTests()
             : base("UtilsTests", @"utilstests")
-        { }
+        {
+            AdditionalSourceRootPaths.Add(Puma.Utils.sSourceFolderPath);
+        }
 
         public override void ConfigureAll(Configuration conf, Sharpmake.Target target)
         {

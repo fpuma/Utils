@@ -1,10 +1,10 @@
 namespace Puma
 {
     [Sharpmake.Export]
-    class GoogleTest : Puma.Common.IExternBinaries
+    class GoogleTest : Puma.SharpmakeBase.IBinaries
     {
         public GoogleTest()
-            : base("GTest", @"googletest-release-1.12.1")
+            : base("GTest", @"extern\googletest-release-1.12.1")
         { }
 
         public override void ConfigureIncludes(Configuration conf, Sharpmake.Target target)

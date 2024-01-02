@@ -3,7 +3,7 @@ using System.IO;
 namespace Puma
 {
     [Sharpmake.Generate]
-    public class UtilsSolution : Puma.Common.IMySolution
+    public class UtilsSolution : Puma.SharpmakeBase.ISolution
     {
         public UtilsSolution()
             : base("Utils")
@@ -13,7 +13,6 @@ namespace Puma
         {
             base.ConfigureAll(conf, target);
 
-            conf.AddProject<Puma.Utils>( target );
             conf.AddProject<Puma.UtilsTests>( target );
         }
     }
