@@ -1,4 +1,4 @@
-namespace Puma
+namespace Extern
 {
     [Sharpmake.Export]
     class GoogleTest : Puma.SharpmakeBase.IBinaries
