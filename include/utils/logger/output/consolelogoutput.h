@@ -1,7 +1,7 @@
 #pragma once
 
-#include <logger/logdefinitions.h>
-#include <logger/output/ilogoutput.h>
+#include <utils/logger/logdefinitions.h>
+#include <utils/logger/output/ilogoutput.h>
 
 #include <assert.h>
 #include <iostream>

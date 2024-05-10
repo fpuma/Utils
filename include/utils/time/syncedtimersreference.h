@@ -1,8 +1,8 @@
 #pragma once
 
-#include <time/timereference.h>
-#include <time/timers/syncedcountdowntimer.h>
-#include <time/timers/syncedtimer.h>
+#include <utils/time/timereference.h>
+#include <utils/time/timers/syncedcountdowntimer.h>
+#include <utils/time/timers/syncedtimer.h>
 
 #include <memory>
 
