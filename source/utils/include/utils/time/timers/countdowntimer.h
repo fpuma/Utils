@@ -1,7 +1,7 @@
 #pragma once
 
-#include <time/timers/syncedcountdowntimer.h>
-#include <time/timereference.h>
+#include <utils/time/timers/syncedcountdowntimer.h>
+#include <utils/time/timereference.h>
 
 namespace puma
 {

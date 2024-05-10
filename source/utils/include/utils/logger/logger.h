@@ -1,7 +1,7 @@
 #pragma once
 
-#include <logger/output/ilogoutput.h>
-#include <logger/logdefinitions.h>
+#include <utils/logger/output/ilogoutput.h>
+#include <utils/logger/logdefinitions.h>
 
 #include <utils/containers/uniquerealizationcontainer.h>
 #include <utils/noncopyable.h>
