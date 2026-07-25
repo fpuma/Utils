@@ -1,6 +1,7 @@
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 #include <utils/geometry/vec2.h>
+#include <utils/geometry/vec2i.h>
 #include <utils/geometry/vec3.h>
 
 using namespace puma;
@@ -26,4 +27,9 @@ TEST( Geometry, Vecs )
 
     EXPECT_FLOAT_EQ( vec2.normalize().length(), 1.0f );
     EXPECT_FLOAT_EQ( vec3.normalize().length(), 1.0f );
+
+    EXPECT_TRUE(Vec2i(1,2) == Vec2i(1,2));
+    EXPECT_TRUE(Vec2i(1,2) < Vec2i(2,3));
+
+    EXPECT_FALSE(Vec2i(1, 2) == Vec2i(2, 3));
 }
