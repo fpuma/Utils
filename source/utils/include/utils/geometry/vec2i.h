@@ -3,6 +3,7 @@
 #include <utils/numerictypes.h>
 
 #include <math.h>
+#include <tuple>
 
 namespace puma
 {
@@ -15,6 +16,16 @@ namespace puma
             : x(_x)
             , y(_y)
         {
+        }
+
+        bool operator == (const Vec2i& _other)const
+        {
+            return x == _other.x && y == _other.y;
+        }
+
+        bool operator < (const Vec2i& _other)const
+        {
+            return std::tie(x, y) < std::tie(_other.x, _other.y);
         }
 
         Vec2i operator + (const Vec2i& _other) const
